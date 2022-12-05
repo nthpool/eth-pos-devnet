@@ -13,7 +13,14 @@ The development net is fully functional and allows for the deployment of smart c
 
 ## Using
 
-First, install Docker. Then, run:
+First, install Docker. Build the images for the [flashbots builder](https://github.com/flashbots/builder) and [prysm fork](https://github.com/flashbots/prysm) (using the docker files within the consensus and execution folders):
+
+```
+docker build . --platform=linux/amd64 --tag=eth-pos-devnet_beacon-chain:latest
+docker build . --platform=linux/amd64 --tag=eth-pos-devnet_geth:latest
+```
+
+Then, run:
 
 ```
 git clone https://github.com/rauljordan/eth-pos-devnet && cd eth-pos-devnet
@@ -71,5 +78,14 @@ Once the mining difficulty of go-ethereum reaches 50, proof-of-stake will be act
 <img width="1728" alt="2" src="https://user-images.githubusercontent.com/5572669/186052300-80d9e6d5-e2b7-4e1a-9113-1593e5a5872f.png">
 <img width="1426" alt="1" src="https://user-images.githubusercontent.com/5572669/186052301-dd487b50-183a-4fa6-bbec-216f32d6f03a.png">
 
+# Configuring the Builder
 
+There are 3 env vars to set in the builder:
 
+- `BUILDER_SECRET_KEY`
+- `RELAY_SECRET_KEY`
+- `BUILDER_TX_SIGNING_KEY`
+
+You can use the private key for 0x123463a4b065722e99115d6c222f267d9cabb524 located in the keystore, as it has an ether balance in the dev net.
+
+Credits to [flashbots-compose](https://github.com/antonydenyer/flashbots-compose/blob/main/prysm/Dockerfile) for the Prysm and Geth Dockerfiles.

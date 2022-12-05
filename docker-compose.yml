@@ -11,22 +11,33 @@ services:
   # Runs the go-ethereum execution client with the specified, unlocked account and necessary
   # APIs to allow for proof-of-stake consensus via Prysm.
   geth:
-    image: "ethereum/client-go:latest"
+    image: "eth-pos-devnet_geth:latest"
     command:
       - --http
-      - --http.api=eth
+      - --http.api=engine,eth,web3,net,debug,flashbots
       - --http.addr=0.0.0.0
       - --authrpc.vhosts=*
       - --authrpc.addr=0.0.0.0
       - --authrpc.jwtsecret=/execution/jwtsecret
-      - --datadir=/execution
+      - --datadir=/execution  
       - --allow-insecure-unlock
       - --unlock=0x123463a4b065722e99115d6c222f267d9cabb524
       - --password=/execution/geth_password.txt
       - --nodiscover
       - --syncmode=full
+      - --verbosity=3
       - --mine
+      - --builder
+      - --builder.local_relay=true
+      - --builder.secret_key=0x2e0834786285daccd064ca17f1654f67b4aef298acbb82cef9ec422fb4975622
+      - --builder.relay_secret_key=0x2e0834786285daccd064ca17f1654f67b4aef298acbb82cef9ec422fb4975622
+      - --builder.genesis_validators_root=0x83431ec7fcf92cfc44947fc0418e831c25e1d0806590231c439830db7ad54fda
+      - --builder.genesis_fork_version=0x20000089
+      - --builder.bellatrix_fork_version=0x20000091
+      - --builder.beacon_endpoint=http://beacon-chain:3500
+      - --miner.algotype=greedy
     ports:
+      - 28545:28545
       - 8551:8551
       - 8545:8545
     depends_on:
@@ -36,6 +47,8 @@ services:
       - ./execution:/execution
       - ./execution/geth_password.txt:/execution/geth_password.txt
       - ./jwtsecret:/execution/jwtsecret
+    environment:
+      - BUILDER_TX_SIGNING_KEY=0x2e0834786285daccd064ca17f1654f67b4aef298acbb82cef9ec422fb4975622
 
   # Creates a genesis state for the beacon chain using a YAML configuration file and
   # a deterministic set of 64 validators.
@@ -55,7 +68,7 @@ services:
   # The account used in go-ethereum is set as the suggested fee recipient for transactions
   # proposed via the validators attached to the beacon node.
   beacon-chain:
-    image: "gcr.io/prysmaticlabs/prysm/beacon-chain:latest"
+    image: "eth-pos-devnet_beacon-chain:latest"
     command:
       - --datadir=/consensus/beacondata
       # No peers to sync with in this testnet, so setting to 0
@@ -74,6 +87,7 @@ services:
       - --accept-terms-of-use
       - --jwt-secret=/execution/jwtsecret
       - --suggested-fee-recipient=0x123463a4b065722e99115d6c222f267d9cabb524
+      - --http-mev-relay=http://geth:28545
     depends_on:
       geth:
         condition: service_started
@@ -98,6 +112,8 @@ services:
       - --interop-num-validators=64
       - --interop-start-index=0
       - --chain-config-file=/consensus/config.yml
+      - --suggested-fee-recipient=0x123463a4b065722e99115d6c222f267d9cabb524
+      - --enable-builder
     depends_on:
       beacon-chain:
         condition: service_started
