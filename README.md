@@ -13,19 +13,16 @@ The development net is fully functional and allows for the deployment of smart c
 
 ## Using
 
-First, install Docker. Build the images for the [flashbots builder](https://github.com/flashbots/builder) and [prysm fork](https://github.com/flashbots/prysm) (using the docker files within the consensus and execution folders):
+First, install Docker.
 
-```
-docker build . --platform=linux/amd64 --tag=eth-pos-devnet_beacon-chain:latest
-docker build . --platform=linux/amd64 --tag=eth-pos-devnet_geth:latest
-```
-
-Then, run:
+Then, run the devnet launch script:
 
 ```
 git clone https://github.com/rauljordan/eth-pos-devnet && cd eth-pos-devnet
-docker compose up -d
+sh start-local-net.sh
 ```
+
+This will build the images for the [flashbots builder](https://github.com/flashbots/builder) and [prysm fork](https://github.com/flashbots/prysm).
 
 You will see the following:
 
@@ -86,6 +83,8 @@ There are 3 env vars to set in the builder:
 - `RELAY_SECRET_KEY`
 - `BUILDER_TX_SIGNING_KEY`
 
-You can use the private key for 0x123463a4b065722e99115d6c222f267d9cabb524 located in the keystore, as it has an ether balance in the dev net.
+You can use the private key for 0x123463a4b065722e99115d6c222f267d9cabb524 located in `sk.json`, as it has an ether balance in the devnet.
+
+When sending bundles, make sure to send from an address other than 0x123463a4b065722e99115d6c222f267d9cabb524 (or the miner coinbase address) as it affects the block profit calculation.
 
 Credits to [flashbots-compose](https://github.com/antonydenyer/flashbots-compose/blob/main/prysm/Dockerfile) for the Prysm and Geth Dockerfiles.
