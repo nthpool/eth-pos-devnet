@@ -7,7 +7,7 @@ services:
     command:
       - testnet
       - generate-genesis
-      - --fork=capella
+      - --fork=bellatrix
       - --num-validators=64
         #- --genesis-time-delay=15
       - --output-ssz=/consensus/genesis.ssz
@@ -35,6 +35,7 @@ services:
     command:
       - --http
       - --http.api=engine,eth,web3,net,debug,flashbots
+      - --vmdebug
       - --http.addr=0.0.0.0
       - --authrpc.vhosts=*
       - --authrpc.addr=0.0.0.0
@@ -46,8 +47,6 @@ services:
       - --nodiscover
       - --syncmode=full
       - --verbosity=3
-      - --mine
-      - --miner.etherbase=0x123463a4b065722e99115d6c222f267d9cabb524
       - --builder
       - --builder.local_relay=true
       - --builder.slots_in_epoch=6
